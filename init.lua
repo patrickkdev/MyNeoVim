@@ -1,49 +1,39 @@
-require("config.lazy")
+vim.g.base46_cache = vim.fn.stdpath "data" .. "/nvchad/base46/"
+vim.g.mapleader = " "
 
--- Auto start insert mode on buffer enter
--- vim.cmd([[autocmd BufEnter * startinsert]])
+-- bootstrap lazy and all plugins
+local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 
--- Save file on Ctrl+S in normal, visual, and insert mode
-vim.api.nvim_set_keymap("n", "<C-S>", ":update<CR>", { silent = true })
-vim.api.nvim_set_keymap("v", "<C-S>", "<C-C>:update<CR>", { silent = true })
-vim.api.nvim_set_keymap("i", "<C-S>", "<C-O>:update<CR>", { silent = true })
+if not vim.loop.fs_stat(lazypath) then
+  local repo = "https://github.com/folke/lazy.nvim.git"
+  vim.fn.system { "git", "clone", "--filter=blob:none", repo, "--branch=stable", lazypath }
+end
 
--- Quit Vim with Ctrl+X in normal and insert mode
-vim.api.nvim_set_keymap("n", "<C-x>", ":quit!<CR>", { silent = true })
-vim.api.nvim_set_keymap("i", "<C-x>", "<Esc>:quit!<CR>", { silent = true })
+vim.opt.rtp:prepend(lazypath)
 
--- Yank to system clipboard with Ctrl+C in visual mode
-vim.api.nvim_set_keymap("v", "<C-c>", '"+yi', { silent = true })
-vim.api.nvim_set_keymap("v", "<C-x>", '"+c', { silent = true })
+local lazy_config = require "configs.lazy"
 
--- Paste from system clipboard with Ctrl+V in visual and insert mode
-vim.api.nvim_set_keymap("v", "<C-v>", 'c<ESC>"+p', { silent = true })
-vim.api.nvim_set_keymap("i", "<C-v>", "<C-r><C-o>+", { silent = true })
+-- load plugins
+require("lazy").setup({
+  {
+    "NvChad/NvChad",
+    lazy = false,
+    branch = "v2.5",
+    import = "nvchad.plugins",
+    config = function()
+      require "options"
+    end,
+  },
 
--- Set clipboard to use system clipboard
-vim.o.clipboard = "unnamed"
-vim.o.clipboard = "unnamedplus"
+  { import = "plugins" },
+}, lazy_config)
 
--- Undo with Ctrl+Z in normal and insert mode
-vim.api.nvim_set_keymap("n", "<c-z>", ":u<CR>", { silent = true })
-vim.api.nvim_set_keymap("i", "<c-z>", "<c-o>:u<CR>", { silent = true })
+-- load theme
+dofile(vim.g.base46_cache .. "defaults")
+dofile(vim.g.base46_cache .. "statusline")
 
--- Select entire buffer with Ctrl+A in normal mode
-vim.api.nvim_set_keymap("n", "<C-a>", "ggVG", { silent = true })
-vim.api.nvim_set_keymap("v", "<C-a>", "ggVG", { silent = true })
-vim.api.nvim_set_keymap("i", "<C-a>", "<Esc>ggVG", { silent = true })
+require "nvchad.autocmds"
 
--- Jump to the end of the line with Ctrl+Left Arrow in insert and normal
-vim.api.nvim_set_keymap("v", "<C-Right>", "$a", { silent = true })
-vim.api.nvim_set_keymap("i", "<C-Right>", "<Esc>$a", { silent = true })
-
--- Jump to the start of the line with Ctrl+Right Arrow in insert and normal mode
-vim.api.nvim_set_keymap("v", "<C-Left>", "0i", { silent = true })
-vim.api.nvim_set_keymap("i", "<C-Left>", "<Esc>0i", { silent = true })
-
--- Multi-cursor functionality with Ctrl+Alt+Arrow in insert mode
-vim.api.nvim_set_keymap("i", "<C-ArrowUp>", "<Esc>m`o<Esc>``i", { silent = true })
-vim.api.nvim_set_keymap("i", "<C-ArrowDown>", "<Esc>m`o<Esc>``i", { silent = true })
-
--- Disable Ctrl+S and Ctrl+Q key flow control
-vim.cmd([[silent !stty -ixon]])
+vim.schedule(function()
+  require "mappings"
+end)
