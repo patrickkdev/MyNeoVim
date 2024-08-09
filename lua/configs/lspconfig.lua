@@ -4,7 +4,7 @@ require("nvchad.configs.lspconfig").defaults()
 local lspconfig = require "lspconfig"
 
 -- EXAMPLE
-local servers = { 'gopls', 'ccls', 'cmake', 'tsserver', 'templ', 'eslint', "typescript", "typescriptreact", "typescript.tsx" }
+local servers = { 'gopls', 'ccls', 'cmake', 'tsserver', 'templ', 'eslint' }
 local nvlsp = require "nvchad.configs.lspconfig"
 
 -- Keep diagnostic message on insert mode
