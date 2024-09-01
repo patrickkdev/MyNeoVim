@@ -6,6 +6,7 @@ local M = {}
 
 M.base46 = {
 	theme = "dark_horizon",
+  transparency = "true",
 	-- hl_override = {
 	-- 	Comment = { italic = true },
 	-- 	["@comment"] = { italic = true },
